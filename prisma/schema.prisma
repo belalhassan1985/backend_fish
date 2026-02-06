@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  parentId    Int?       @map("parentId")
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToCategory")
+  nameAr      String     @map("name_ar")
+  nameEn      String?    @map("name_en")
+  slug        String     @unique
+  description String?    @db.Text
+  imageUrl    String?    @map("imageUrl")
+  sortOrder   Int        @default(0) @map("sortOrder")
+  isActive    Boolean    @default(true) @map("isActive")
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id             Int            @id @default(autoincrement())
+  categoryId     Int            @map("categoryId")
+  category       Category       @relation(fields: [categoryId], references: [id])
+  sku            String?
+  nameAr         String         @map("name_ar")
+  nameEn         String?        @map("name_en")
+  slug           String         @unique
+  description    String?        @db.Text
+  price          Decimal        @db.Decimal(10, 2)
+  compareAtPrice Decimal?       @map("compareAtPrice") @db.Decimal(10, 2)
+  stockQty       Int            @default(0) @map("stockQty")
+  isInStock      Boolean        @default(true) @map("isInStock")
+  isFeatured     Boolean        @default(false) @map("isFeatured")
+  isActive       Boolean        @default(true) @map("isActive")
+  productType    ProductType    @default(FISH) @map("productType")
+  waterType      WaterType?     @map("waterType")
+  difficulty     Difficulty?    @map("difficulty")
+  sizeCmMin      Float?         @map("sizeCmMin")
+  sizeCmMax      Float?         @map("sizeCmMax")
+  tempCMin       Float?         @map("tempCMin")
+  tempCMax       Float?         @map("tempCMax")
+  media          ProductMedia[]
+  tags           ProductTag[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@map("products")
+}
+
+enum ProductType {
+  FISH
+  EQUIPMENT
+  FOOD
+  MEDICINE
+  PLANT
+  OTHER
+}
+
+enum WaterType {
+  FRESH
+  SALT
+  BRACKISH
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
+}
+
+model ProductMedia {
+  id             Int       @id @default(autoincrement())
+  productId      Int       @map("productId")
+  product        Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  mediaType      MediaType @default(IMAGE) @map("mediaType")
+  url            String?
+  youtubeVideoId String?   @map("youtubeVideoId")
+  title          String?
+  description    String?
+  isPrimary      Boolean   @default(false) @map("isPrimary")
+  displayOrder   Int       @default(0) @map("displayOrder")
+
+  @@map("product_media")
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  YOUTUBE
+}
+
+model Tag {
+  id       Int          @id @default(autoincrement())
+  nameAr   String       @map("name_ar")
+  slug     String       @unique
+  products ProductTag[]
+
+  @@map("tags")
+}
+
+model ProductTag {
+  productId Int @map("productId")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tagId     Int @map("tagId")
+  tag       Tag     @relation(fields: [tagId], references: [id])
+
+  @@id([productId, tagId])
+  @@map("product_tags")
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  orderNumber    String      @unique // e.g. 2026-000001
+  customerName   String      @map("customerName")
+  phone          String
+  address        String?     @db.Text
+  note           String?     @db.Text
+  total          Decimal     @db.Decimal(10, 2)
+  status         OrderStatus @default(PENDING)
+  createdAt      DateTime    @default(now())
+  items          OrderItem[]
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model OrderItem {
+  id           Int     @id @default(autoincrement())
+  orderId      Int     @map("orderId")
+  order        Order   @relation(fields: [orderId], references: [id])
+  productId    Int     @map("productId")
+  productName  String  @map("productName")
+  productPrice Decimal @map("productPrice") @db.Decimal(10, 2)
+  qty          Int
+
+  @@map("order_items")
+}
+
+model StoreSettings {
+  id           Int    @id @default(autoincrement())
+  settingKey   String @unique @map("settingKey")
+  settingValue String @db.Text @map("settingValue")
+
+  @@map("store_settings")
+}
