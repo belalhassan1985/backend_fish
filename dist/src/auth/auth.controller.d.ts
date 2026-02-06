@@ -6,8 +6,9 @@ export declare class AuthController {
         success: boolean;
         accessToken: string;
         user: {
-            name: string;
-            role: string;
+            name: any;
+            email: any;
+            role: any;
         };
     }>;
 }

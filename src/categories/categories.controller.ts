@@ -23,6 +23,7 @@ export class CategoriesController {
 
     @Patch(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body() updateCategoryDto: Prisma.CategoryUncheckedUpdateInput) {
+        console.log(`Updating category ${id}`, updateCategoryDto);
         return this.categoriesService.update(id, updateCategoryDto);
     }
 

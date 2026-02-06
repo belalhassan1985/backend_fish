@@ -5,6 +5,8 @@ export declare class ProductsController {
     constructor(productsService: ProductsService);
     create(createProductDto: Prisma.ProductUncheckedCreateInput): Promise<{
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         slug: string;
         nameAr: string;
         nameEn: string | null;
@@ -24,8 +26,6 @@ export declare class ProductsController {
         sizeCmMax: number | null;
         tempCMin: number | null;
         tempCMax: number | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     findAll(categorySlug?: string, q?: string, type?: ProductType, featured?: string, tag?: string): Promise<({
         category: {
@@ -62,6 +62,8 @@ export declare class ProductsController {
         })[];
     } & {
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         slug: string;
         nameAr: string;
         nameEn: string | null;
@@ -81,8 +83,6 @@ export declare class ProductsController {
         sizeCmMax: number | null;
         tempCMin: number | null;
         tempCMax: number | null;
-        createdAt: Date;
-        updatedAt: Date;
     })[]>;
     findById(id: number): Promise<({
         category: {
@@ -119,6 +119,8 @@ export declare class ProductsController {
         })[];
     } & {
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         slug: string;
         nameAr: string;
         nameEn: string | null;
@@ -138,8 +140,6 @@ export declare class ProductsController {
         sizeCmMax: number | null;
         tempCMin: number | null;
         tempCMax: number | null;
-        createdAt: Date;
-        updatedAt: Date;
     }) | null>;
     findOne(slug: string): Promise<({
         category: {
@@ -176,6 +176,8 @@ export declare class ProductsController {
         })[];
     } & {
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         slug: string;
         nameAr: string;
         nameEn: string | null;
@@ -195,11 +197,11 @@ export declare class ProductsController {
         sizeCmMax: number | null;
         tempCMin: number | null;
         tempCMax: number | null;
-        createdAt: Date;
-        updatedAt: Date;
     }) | null>;
     update(id: number, updateProductDto: Prisma.ProductUncheckedUpdateInput): Promise<{
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         slug: string;
         nameAr: string;
         nameEn: string | null;
@@ -219,11 +221,11 @@ export declare class ProductsController {
         sizeCmMax: number | null;
         tempCMin: number | null;
         tempCMax: number | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     toggleActive(id: number): Promise<{
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         slug: string;
         nameAr: string;
         nameEn: string | null;
@@ -243,11 +245,11 @@ export declare class ProductsController {
         sizeCmMax: number | null;
         tempCMin: number | null;
         tempCMax: number | null;
-        createdAt: Date;
-        updatedAt: Date;
     } | null>;
     remove(id: number): Promise<{
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         slug: string;
         nameAr: string;
         nameEn: string | null;
@@ -267,7 +269,5 @@ export declare class ProductsController {
         sizeCmMax: number | null;
         tempCMin: number | null;
         tempCMax: number | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
 }

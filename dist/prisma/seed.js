@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
+const bcrypt = require("bcrypt");
 const prisma = new client_1.PrismaClient();
 async function main() {
     console.log('Seeding...');
@@ -133,8 +134,21 @@ async function main() {
     }
     await prisma.storeSettings.upsert({
         where: { settingKey: 'whatsapp_number' },
-        update: { settingValue: '9647735125056' },
-        create: { settingKey: 'whatsapp_number', settingValue: '9647735125056' },
+        update: { settingValue: '9647761671476' },
+        create: { settingKey: 'whatsapp_number', settingValue: '9647761671476' },
+    });
+    const saltRounds = 10;
+    const password = 'admin123';
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    await prisma.user.upsert({
+        where: { email: 'admin' },
+        update: {},
+        create: {
+            email: 'admin',
+            password: hashedPassword,
+            name: 'Admin',
+            role: 'ADMIN',
+        },
     });
     console.log('Seeding finished.');
 }

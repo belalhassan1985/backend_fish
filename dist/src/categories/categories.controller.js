@@ -31,6 +31,7 @@ let CategoriesController = class CategoriesController {
         return this.categoriesService.findOne(id);
     }
     update(id, updateCategoryDto) {
+        console.log(`Updating category ${id}`, updateCategoryDto);
         return this.categoriesService.update(id, updateCategoryDto);
     }
     toggleActive(id) {

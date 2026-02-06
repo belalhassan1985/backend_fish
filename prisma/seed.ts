@@ -1,4 +1,5 @@
 import { PrismaClient, MediaType, ProductType, WaterType, Difficulty } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -15,7 +16,7 @@ async function main() {
     { id: 6, parentId: null, nameAr: 'العلاج وقياسات الماء', nameEn: 'Treatment & Water Tests', slug: 'treatment-water-tests', description: 'أدوية وفحوصات ومزيلات كلور', imageUrl: 'https://picsum.photos/seed/cat-test/1200/600', sortOrder: 6, isActive: true },
     { id: 7, parentId: null, nameAr: 'الديكور والنباتات', nameEn: 'Decor & Plants', slug: 'decor-plants', description: 'ديكور ونباتات ومستلزمات شكلية', imageUrl: 'https://picsum.photos/seed/cat-decor/1200/600', sortOrder: 7, isActive: true },
     { id: 8, parentId: null, nameAr: 'التنظيف والصيانة', nameEn: 'Cleaning & Maintenance', slug: 'cleaning-maintenance', description: 'معدات تنظيف وصيانة', imageUrl: 'https://picsum.photos/seed/cat-clean/1200/600', sortOrder: 8, isActive: true },
-    
+
     // Children
     { id: 9, parentId: 1, nameAr: 'مياه عذبة', nameEn: 'Freshwater', slug: 'freshwater-fish', description: 'أسماك مياه عذبة مناسبة للأحواض المنزلية', imageUrl: 'https://picsum.photos/seed/cat-fresh/1200/600', sortOrder: 1, isActive: true },
     { id: 10, parentId: 1, nameAr: 'مياه مالحة', nameEn: 'Saltwater', slug: 'saltwater-fish', description: 'أسماك مياه مالحة (خبرة أعلى)', imageUrl: 'https://picsum.photos/seed/cat-salt/1200/600', sortOrder: 2, isActive: true },
@@ -159,12 +160,30 @@ async function main() {
   // 6) Store Settings
   await prisma.storeSettings.upsert({
     where: { settingKey: 'whatsapp_number' },
-    update: { settingValue: '9647735125056' },
-    create: { settingKey: 'whatsapp_number', settingValue: '9647735125056' },
+    update: { settingValue: '9647761671476' },
+    create: { settingKey: 'whatsapp_number', settingValue: '9647761671476' },
+  });
+
+
+  // 7) Admin User
+  const saltRounds = 10;
+  const password = 'admin123';
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  await prisma.user.upsert({
+    where: { email: 'admin' },
+    update: {},
+    create: {
+      email: 'admin',
+      password: hashedPassword,
+      name: 'Admin',
+      role: 'ADMIN',
+    },
   });
 
   console.log('Seeding finished.');
 }
+
 
 main()
   .catch((e) => {
