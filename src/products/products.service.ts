@@ -28,18 +28,15 @@ export class ProductsService {
         }
     }
 
-    async findAll(query: { categorySlug?: string; q?: string; type?: ProductType; featured?: boolean; tag?: string }) {
+    async findAll(query: { categorySlug?: string; q?: string; type?: ProductType; featured?: boolean; tag?: string; sort?: string; order?: 'asc' | 'desc'; limit?: number }) {
         const where: Prisma.ProductWhereInput = { isActive: true };
 
         if (query.categorySlug) {
             const category = await this.prisma.category.findUnique({ where: { slug: query.categorySlug } });
             if (category) {
-                // Optional: Include children categories logic here if needed. 
-                // For now, exact match or use SQL param to find children.
-                // Let's simplified: exact match.
                 where.categoryId = category.id;
             } else {
-                return []; // Category not found
+                return [];
             }
         }
 
@@ -55,12 +52,16 @@ export class ProductsService {
         }
 
         if (query.featured) {
-            where.isFeatured = true; // Assumes input is boolean true or 'true' needed parsing in controller
+            where.isFeatured = true;
         }
 
         if (query.tag) {
             where.tags = { some: { tag: { slug: query.tag } } };
         }
+
+        const orderBy: Prisma.ProductOrderByWithRelationInput = query.sort
+            ? { [query.sort]: query.order || 'desc' }
+            : { isFeatured: 'desc' };
 
         return this.prisma.product.findMany({
             where,
@@ -69,7 +70,8 @@ export class ProductsService {
                 category: true,
                 tags: { include: { tag: true } }
             },
-            orderBy: { isFeatured: 'desc' }, // Featured first, then arbitrary (id)
+            orderBy,
+            take: query.limit,
         });
     }
 

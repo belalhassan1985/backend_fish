@@ -64,6 +64,9 @@ let ProductsService = class ProductsService {
         if (query.tag) {
             where.tags = { some: { tag: { slug: query.tag } } };
         }
+        const orderBy = query.sort
+            ? { [query.sort]: query.order || 'desc' }
+            : { isFeatured: 'desc' };
         return this.prisma.product.findMany({
             where,
             include: {
@@ -71,7 +74,8 @@ let ProductsService = class ProductsService {
                 category: true,
                 tags: { include: { tag: true } }
             },
-            orderBy: { isFeatured: 'desc' },
+            orderBy,
+            take: query.limit,
         });
     }
     async findOne(slug) {

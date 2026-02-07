@@ -17,15 +17,21 @@ export class ProductsController {
         @Query('categorySlug') categorySlug?: string,
         @Query('q') q?: string,
         @Query('type') type?: ProductType,
-        @Query('featured') featured?: string, // Parse manually or use transform
+        @Query('featured') featured?: string,
         @Query('tag') tag?: string,
+        @Query('sort') sort?: string,
+        @Query('order') order?: 'asc' | 'desc',
+        @Query('limit') limit?: string,
     ) {
         return this.productsService.findAll({
             categorySlug,
             q,
             type,
             featured: featured === 'true' || featured === '1',
-            tag
+            tag,
+            sort,
+            order,
+            limit: limit ? parseInt(limit) : undefined,
         });
     }
 

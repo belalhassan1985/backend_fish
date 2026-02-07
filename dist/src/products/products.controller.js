@@ -24,13 +24,16 @@ let ProductsController = class ProductsController {
     create(createProductDto) {
         return this.productsService.create(createProductDto);
     }
-    findAll(categorySlug, q, type, featured, tag) {
+    findAll(categorySlug, q, type, featured, tag, sort, order, limit) {
         return this.productsService.findAll({
             categorySlug,
             q,
             type,
             featured: featured === 'true' || featured === '1',
-            tag
+            tag,
+            sort,
+            order,
+            limit: limit ? parseInt(limit) : undefined,
         });
     }
     findById(id) {
@@ -65,8 +68,11 @@ __decorate([
     __param(2, (0, common_1.Query)('type')),
     __param(3, (0, common_1.Query)('featured')),
     __param(4, (0, common_1.Query)('tag')),
+    __param(5, (0, common_1.Query)('sort')),
+    __param(6, (0, common_1.Query)('order')),
+    __param(7, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, String, String]),
+    __metadata("design:paramtypes", [String, String, String, String, String, String, String, String]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findAll", null);
 __decorate([

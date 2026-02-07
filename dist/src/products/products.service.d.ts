@@ -33,6 +33,9 @@ export declare class ProductsService {
         type?: ProductType;
         featured?: boolean;
         tag?: string;
+        sort?: string;
+        order?: 'asc' | 'desc';
+        limit?: number;
     }): Promise<({
         category: {
             id: number;

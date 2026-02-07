@@ -27,7 +27,7 @@ export declare class ProductsController {
         tempCMin: number | null;
         tempCMax: number | null;
     }>;
-    findAll(categorySlug?: string, q?: string, type?: ProductType, featured?: string, tag?: string): Promise<({
+    findAll(categorySlug?: string, q?: string, type?: ProductType, featured?: string, tag?: string, sort?: string, order?: 'asc' | 'desc', limit?: string): Promise<({
         category: {
             id: number;
             slug: string;
