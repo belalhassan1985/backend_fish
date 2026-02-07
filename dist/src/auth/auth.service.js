@@ -21,11 +21,15 @@ let AuthService = class AuthService {
         this.prisma = prisma;
         this.jwtService = jwtService;
     }
-    async validateUser(email, pass) {
-        const user = await this.prisma.user.findFirst({
-            where: { email },
+    async validateUser(usernameOrEmail, pass) {
+        const userFound = await this.prisma.user.findFirst({
+            where: {
+                OR: [
+                    { email: usernameOrEmail },
+                    { name: usernameOrEmail }
+                ]
+            }
         });
-        const userFound = await this.prisma.user.findUnique({ where: { email } });
         if (userFound && (await bcrypt.compare(pass, userFound.password))) {
             const { password, ...result } = userFound;
             return result;

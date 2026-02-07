@@ -17,13 +17,14 @@ const media_module_1 = require("./media/media.module");
 const settings_module_1 = require("./settings/settings.module");
 const prisma_module_1 = require("./prisma/prisma.module");
 const auth_module_1 = require("./auth/auth.module");
+const users_module_1 = require("./users/users.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            prisma_module_1.PrismaModule, categories_module_1.CategoriesModule, products_module_1.ProductsModule, orders_module_1.OrdersModule, media_module_1.MediaModule, auth_module_1.AuthModule, settings_module_1.SettingsModule
+            prisma_module_1.PrismaModule, categories_module_1.CategoriesModule, products_module_1.ProductsModule, orders_module_1.OrdersModule, media_module_1.MediaModule, auth_module_1.AuthModule, settings_module_1.SettingsModule, users_module_1.UsersModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

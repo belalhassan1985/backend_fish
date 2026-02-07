@@ -10,17 +10,15 @@ export class AuthService {
         private jwtService: JwtService,
     ) { }
 
-    async validateUser(email: string, pass: string): Promise<any> {
-        const user = await this.prisma.user.findFirst({ // using findFirst because email is unique but findUnique requires strictly typed unique usage
-            where: { email },
-        }); // or define unique in schema and use findUnique
-        // Actually schema says @unique, so findUnique is better but let's stick to findFirst simply or findUnique strictly
-
-        // Better:
-        // const user = await this.prisma.user.findUnique({ where: { email } });
-
-        // However, I will use logic to be safe:
-        const userFound = await this.prisma.user.findUnique({ where: { email } });
+    async validateUser(usernameOrEmail: string, pass: string): Promise<any> {
+        const userFound = await this.prisma.user.findFirst({
+            where: {
+                OR: [
+                    { email: usernameOrEmail },
+                    { name: usernameOrEmail }
+                ]
+            }
+        });
 
         if (userFound && (await bcrypt.compare(pass, userFound.password))) {
             const { password, ...result } = userFound;

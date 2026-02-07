@@ -8,10 +8,11 @@ import { MediaModule } from './media/media.module';
 import { SettingsModule } from './settings/settings.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    PrismaModule, CategoriesModule, ProductsModule, OrdersModule, MediaModule, AuthModule, SettingsModule
+    PrismaModule, CategoriesModule, ProductsModule, OrdersModule, MediaModule, AuthModule, SettingsModule, UsersModule
   ],
   controllers: [AppController],
   providers: [AppService],
