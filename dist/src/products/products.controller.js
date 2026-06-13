@@ -24,15 +24,19 @@ let ProductsController = class ProductsController {
     create(createProductDto) {
         return this.productsService.create(createProductDto);
     }
-    findAll(categorySlug, q, type, featured, tag, sort, order, limit) {
+    findAll(page, limit, categorySlug, q, type, featured, tag, sort, order) {
+        const baseQuery = { categorySlug, q, type, tag, sort, order, featured: featured === 'true' || featured === '1' };
+        if (page) {
+            const pageNumber = Math.max(1, Number(page) || 1);
+            const limitNumber = Math.min(50, Math.max(1, Number(limit) || 20));
+            return this.productsService.findAllPaginated({
+                ...baseQuery,
+                page: pageNumber,
+                limit: limitNumber,
+            });
+        }
         return this.productsService.findAll({
-            categorySlug,
-            q,
-            type,
-            featured: featured === 'true' || featured === '1',
-            tag,
-            sort,
-            order,
+            ...baseQuery,
             limit: limit ? parseInt(limit) : undefined,
         });
     }
@@ -55,7 +59,6 @@ let ProductsController = class ProductsController {
 exports.ProductsController = ProductsController;
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -63,16 +66,17 @@ __decorate([
 ], ProductsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)('categorySlug')),
-    __param(1, (0, common_1.Query)('q')),
-    __param(2, (0, common_1.Query)('type')),
-    __param(3, (0, common_1.Query)('featured')),
-    __param(4, (0, common_1.Query)('tag')),
-    __param(5, (0, common_1.Query)('sort')),
-    __param(6, (0, common_1.Query)('order')),
-    __param(7, (0, common_1.Query)('limit')),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('limit')),
+    __param(2, (0, common_1.Query)('categorySlug')),
+    __param(3, (0, common_1.Query)('q')),
+    __param(4, (0, common_1.Query)('type')),
+    __param(5, (0, common_1.Query)('featured')),
+    __param(6, (0, common_1.Query)('tag')),
+    __param(7, (0, common_1.Query)('sort')),
+    __param(8, (0, common_1.Query)('order')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, String, String, String, String, String]),
+    __metadata("design:paramtypes", [String, String, String, String, String, String, String, String, String]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findAll", null);
 __decorate([

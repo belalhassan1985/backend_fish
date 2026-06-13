@@ -38,7 +38,7 @@ let ProductsService = class ProductsService {
             throw error;
         }
     }
-    async findAll(query) {
+    async buildWhere(query) {
         const where = { isActive: true };
         if (query.categorySlug) {
             const category = await this.prisma.category.findUnique({ where: { slug: query.categorySlug } });
@@ -46,7 +46,7 @@ let ProductsService = class ProductsService {
                 where.categoryId = category.id;
             }
             else {
-                return [];
+                return null;
             }
         }
         if (query.q) {
@@ -64,38 +64,62 @@ let ProductsService = class ProductsService {
         if (query.tag) {
             where.tags = { some: { tag: { slug: query.tag } } };
         }
-        const orderBy = query.sort
-            ? { [query.sort]: query.order || 'desc' }
+        return where;
+    }
+    buildOrderBy(sort, order) {
+        return sort
+            ? { [sort]: order || 'desc' }
             : { isFeatured: 'desc' };
+    }
+    include = {
+        media: { orderBy: { displayOrder: 'asc' } },
+        category: true,
+        tags: { include: { tag: true } }
+    };
+    async findAll(query) {
+        const where = await this.buildWhere(query);
+        if (!where)
+            return [];
         return this.prisma.product.findMany({
             where,
-            include: {
-                media: { orderBy: { displayOrder: 'asc' } },
-                category: true,
-                tags: { include: { tag: true } }
-            },
-            orderBy,
+            include: this.include,
+            orderBy: this.buildOrderBy(query.sort, query.order),
             take: query.limit,
         });
+    }
+    async findAllPaginated(query) {
+        const where = await this.buildWhere(query);
+        if (!where)
+            return { data: [], total: 0, page: query.page, limit: query.limit, totalPages: 0 };
+        const skip = (query.page - 1) * query.limit;
+        const [data, total] = await Promise.all([
+            this.prisma.product.findMany({
+                where,
+                include: this.include,
+                orderBy: this.buildOrderBy(query.sort, query.order),
+                skip,
+                take: query.limit,
+            }),
+            this.prisma.product.count({ where }),
+        ]);
+        return {
+            data,
+            total,
+            page: query.page,
+            limit: query.limit,
+            totalPages: Math.ceil(total / query.limit),
+        };
     }
     async findOne(slug) {
         return this.prisma.product.findUnique({
             where: { slug },
-            include: {
-                media: { orderBy: { displayOrder: 'asc' } },
-                category: true,
-                tags: { include: { tag: true } }
-            },
+            include: this.include,
         });
     }
     async findById(id) {
         return this.prisma.product.findUnique({
             where: { id },
-            include: {
-                media: { orderBy: { displayOrder: 'asc' } },
-                category: true,
-                tags: { include: { tag: true } }
-            },
+            include: this.include,
         });
     }
     async update(id, data) {

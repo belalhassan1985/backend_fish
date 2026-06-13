@@ -27,7 +27,69 @@ export declare class ProductsController {
         tempCMin: number | null;
         tempCMax: number | null;
     }>;
-    findAll(categorySlug?: string, q?: string, type?: ProductType, featured?: string, tag?: string, sort?: string, order?: 'asc' | 'desc', limit?: string): Promise<({
+    findAll(page?: string, limit?: string, categorySlug?: string, q?: string, type?: ProductType, featured?: string, tag?: string, sort?: string, order?: 'asc' | 'desc'): Promise<{
+        data: ({
+            category: {
+                id: number;
+                slug: string;
+                parentId: number | null;
+                nameAr: string;
+                nameEn: string | null;
+                description: string | null;
+                imageUrl: string | null;
+                sortOrder: number;
+                isActive: boolean;
+            };
+            media: {
+                id: number;
+                description: string | null;
+                mediaType: import(".prisma/client").$Enums.MediaType;
+                url: string | null;
+                youtubeVideoId: string | null;
+                title: string | null;
+                isPrimary: boolean;
+                displayOrder: number;
+                productId: number;
+            }[];
+            tags: ({
+                tag: {
+                    id: number;
+                    slug: string;
+                    nameAr: string;
+                };
+            } & {
+                productId: number;
+                tagId: number;
+            })[];
+        } & {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            slug: string;
+            nameAr: string;
+            nameEn: string | null;
+            description: string | null;
+            isActive: boolean;
+            compareAtPrice: Prisma.Decimal | null;
+            categoryId: number;
+            sku: string | null;
+            price: Prisma.Decimal;
+            stockQty: number;
+            isInStock: boolean;
+            isFeatured: boolean;
+            productType: import(".prisma/client").$Enums.ProductType;
+            waterType: import(".prisma/client").$Enums.WaterType | null;
+            difficulty: import(".prisma/client").$Enums.Difficulty | null;
+            sizeCmMin: number | null;
+            sizeCmMax: number | null;
+            tempCMin: number | null;
+            tempCMax: number | null;
+        })[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }> | Promise<({
         category: {
             id: number;
             slug: string;

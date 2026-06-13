@@ -22,12 +22,12 @@ export declare class OrdersController {
     } & {
         id: number;
         createdAt: Date;
+        total: import("@prisma/client/runtime/library").Decimal;
         customerName: string;
         phone: string;
         address: string | null;
         note: string | null;
         orderNumber: string;
-        total: import("@prisma/client/runtime/library").Decimal;
         status: import(".prisma/client").$Enums.OrderStatus;
     })[]>;
     findOne(id: number): Promise<({
@@ -42,23 +42,23 @@ export declare class OrdersController {
     } & {
         id: number;
         createdAt: Date;
+        total: import("@prisma/client/runtime/library").Decimal;
         customerName: string;
         phone: string;
         address: string | null;
         note: string | null;
         orderNumber: string;
-        total: import("@prisma/client/runtime/library").Decimal;
         status: import(".prisma/client").$Enums.OrderStatus;
     }) | null>;
     updateStatus(id: number, status: OrderStatus): Promise<{
         id: number;
         createdAt: Date;
+        total: import("@prisma/client/runtime/library").Decimal;
         customerName: string;
         phone: string;
         address: string | null;
         note: string | null;
         orderNumber: string;
-        total: import("@prisma/client/runtime/library").Decimal;
         status: import(".prisma/client").$Enums.OrderStatus;
     }>;
 }

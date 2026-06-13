@@ -7,13 +7,14 @@ export class ProductsController {
     constructor(private readonly productsService: ProductsService) { }
 
     @Post()
-    @Post()
     create(@Body() createProductDto: Prisma.ProductUncheckedCreateInput) {
         return this.productsService.create(createProductDto);
     }
 
     @Get()
     findAll(
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
         @Query('categorySlug') categorySlug?: string,
         @Query('q') q?: string,
         @Query('type') type?: ProductType,
@@ -21,16 +22,21 @@ export class ProductsController {
         @Query('tag') tag?: string,
         @Query('sort') sort?: string,
         @Query('order') order?: 'asc' | 'desc',
-        @Query('limit') limit?: string,
     ) {
+        const baseQuery = { categorySlug, q, type, tag, sort, order, featured: featured === 'true' || featured === '1' };
+
+        if (page) {
+            const pageNumber = Math.max(1, Number(page) || 1);
+            const limitNumber = Math.min(50, Math.max(1, Number(limit) || 20));
+            return this.productsService.findAllPaginated({
+                ...baseQuery,
+                page: pageNumber,
+                limit: limitNumber,
+            });
+        }
+
         return this.productsService.findAll({
-            categorySlug,
-            q,
-            type,
-            featured: featured === 'true' || featured === '1',
-            tag,
-            sort,
-            order,
+            ...baseQuery,
             limit: limit ? parseInt(limit) : undefined,
         });
     }

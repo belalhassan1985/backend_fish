@@ -14,7 +14,6 @@ export class ProductsService {
                     media: data.media ? {
                         create: (data.media as any).create.map((m: any) => ({
                             ...m,
-                            // Ensure undefineds are removed or handled if Prisma doesn't like them
                         }))
                     } : undefined
                 }
@@ -28,7 +27,7 @@ export class ProductsService {
         }
     }
 
-    async findAll(query: { categorySlug?: string; q?: string; type?: ProductType; featured?: boolean; tag?: string; sort?: string; order?: 'asc' | 'desc'; limit?: number }) {
+    private async buildWhere(query: { categorySlug?: string; q?: string; type?: ProductType; featured?: boolean; tag?: string }): Promise<Prisma.ProductWhereInput | null> {
         const where: Prisma.ProductWhereInput = { isActive: true };
 
         if (query.categorySlug) {
@@ -36,7 +35,7 @@ export class ProductsService {
             if (category) {
                 where.categoryId = category.id;
             } else {
-                return [];
+                return null; // category not found → no results
             }
         }
 
@@ -59,41 +58,70 @@ export class ProductsService {
             where.tags = { some: { tag: { slug: query.tag } } };
         }
 
-        const orderBy: Prisma.ProductOrderByWithRelationInput = query.sort
-            ? { [query.sort]: query.order || 'desc' }
+        return where;
+    }
+
+    private buildOrderBy(sort?: string, order?: 'asc' | 'desc'): Prisma.ProductOrderByWithRelationInput {
+        return sort
+            ? { [sort]: order || 'desc' }
             : { isFeatured: 'desc' };
+    }
+
+    private include = {
+        media: { orderBy: { displayOrder: 'asc' as const } },
+        category: true,
+        tags: { include: { tag: true } }
+    };
+
+    async findAll(query: { categorySlug?: string; q?: string; type?: ProductType; featured?: boolean; tag?: string; sort?: string; order?: 'asc' | 'desc'; limit?: number }) {
+        const where = await this.buildWhere(query);
+        if (!where) return [];
 
         return this.prisma.product.findMany({
             where,
-            include: {
-                media: { orderBy: { displayOrder: 'asc' } },
-                category: true,
-                tags: { include: { tag: true } }
-            },
-            orderBy,
+            include: this.include,
+            orderBy: this.buildOrderBy(query.sort, query.order),
             take: query.limit,
         });
+    }
+
+    async findAllPaginated(query: { categorySlug?: string; q?: string; type?: ProductType; featured?: boolean; tag?: string; sort?: string; order?: 'asc' | 'desc'; page: number; limit: number }) {
+        const where = await this.buildWhere(query);
+        if (!where) return { data: [], total: 0, page: query.page, limit: query.limit, totalPages: 0 };
+
+        const skip = (query.page - 1) * query.limit;
+
+        const [data, total] = await Promise.all([
+            this.prisma.product.findMany({
+                where,
+                include: this.include,
+                orderBy: this.buildOrderBy(query.sort, query.order),
+                skip,
+                take: query.limit,
+            }),
+            this.prisma.product.count({ where }),
+        ]);
+
+        return {
+            data,
+            total,
+            page: query.page,
+            limit: query.limit,
+            totalPages: Math.ceil(total / query.limit),
+        };
     }
 
     async findOne(slug: string) {
         return this.prisma.product.findUnique({
             where: { slug },
-            include: {
-                media: { orderBy: { displayOrder: 'asc' } },
-                category: true,
-                tags: { include: { tag: true } }
-            },
+            include: this.include,
         });
     }
 
     async findById(id: number) {
         return this.prisma.product.findUnique({
             where: { id },
-            include: {
-                media: { orderBy: { displayOrder: 'asc' } },
-                category: true,
-                tags: { include: { tag: true } }
-            },
+            include: this.include,
         });
     }
 
