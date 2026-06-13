@@ -38,12 +38,28 @@ let ProductsService = class ProductsService {
             throw error;
         }
     }
+    async getCategoryDescendantIds(slug) {
+        const category = await this.prisma.category.findUnique({
+            where: { slug },
+            include: { children: { include: { children: true } } }
+        });
+        if (!category)
+            return null;
+        const ids = [category.id];
+        for (const child of category.children) {
+            ids.push(child.id);
+            for (const grandchild of child.children ?? []) {
+                ids.push(grandchild.id);
+            }
+        }
+        return ids;
+    }
     async buildWhere(query) {
         const where = { isActive: true };
         if (query.categorySlug) {
-            const category = await this.prisma.category.findUnique({ where: { slug: query.categorySlug } });
-            if (category) {
-                where.categoryId = category.id;
+            const ids = await this.getCategoryDescendantIds(query.categorySlug);
+            if (ids) {
+                where.categoryId = ids.length === 1 ? ids[0] : { in: ids };
             }
             else {
                 return null;

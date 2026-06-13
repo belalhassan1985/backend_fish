@@ -27,6 +27,7 @@ export declare class ProductsService {
         tempCMin: number | null;
         tempCMax: number | null;
     }>;
+    private getCategoryDescendantIds;
     private buildWhere;
     private buildOrderBy;
     private include;
